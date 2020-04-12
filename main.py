@@ -86,4 +86,33 @@ def search_euler_loop(adjacency_matrix):
     find_euler_path(stack, matrix_of_power, adjacency_matrix)
 
 
-search_euler_loop(create_adjacency_matrix(get_data()))
+def hamilton_cycle(curr, adjacency_matrix, n, path):
+    path.append(curr)
+    if len(path) == n:
+        if adjacency_matrix[path[0]][path[-1]] == 1:
+            return True
+        else:
+            path.pop()
+            return False
+    visited[curr] = True
+    for next_my in range(n):
+        if adjacency_matrix[curr][next_my] == 1 and not visited[next_my]:
+            if hamilton_cycle(next_my, adjacency_matrix, n, path):
+                return True
+    visited[curr] = False
+    path.pop()
+    return False
+
+
+def show_hamilton_path(path):
+    for x in path:
+        print(x + 1, end="->")
+
+
+# search_euler_loop(create_adjacency_matrix(get_data()))
+myAdjacencyMatrix = create_adjacency_matrix(get_data())
+visited = [False] * len(myAdjacencyMatrix)
+Path = []
+if hamilton_cycle(0, myAdjacencyMatrix, len(myAdjacencyMatrix), Path):
+    print("Знайдено гамільтоновий цикл: ")
+    show_hamilton_path(Path)
