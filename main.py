@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 def get_data():
     data = []
     with open("input.txt") as iFile:
@@ -74,7 +77,8 @@ def find_euler_path(array, matrix_of_power, adjacency_matrix):
 
 
 def search_euler_loop(adjacency_matrix):
-    matrix_of_power = create_power_of_heights(adjacency_matrix)
+    matrix = deepcopy(adjacency_matrix)
+    matrix_of_power = create_power_of_heights(matrix)
     if is_euler_loop(matrix_of_power):
         print("Граф містить Ейлеровий цикл")
     elif is_euler_path(matrix_of_power):
@@ -83,7 +87,7 @@ def search_euler_loop(adjacency_matrix):
         print("Граф не містить Ейлерового циклу чи шляху")
         return
     stack = find_start_point(matrix_of_power)
-    find_euler_path(stack, matrix_of_power, adjacency_matrix)
+    find_euler_path(stack, matrix_of_power, matrix)
 
 
 def hamilton_cycle(curr, adjacency_matrix, n, path):
@@ -104,15 +108,46 @@ def hamilton_cycle(curr, adjacency_matrix, n, path):
     return False
 
 
+def hamilton_path_for_single(curr, adjacency_matrix, n, path):
+    path.append(curr)
+    if len(path) == n:
+        return True
+    visited[curr] = True
+    for next_my in range(n):
+        if adjacency_matrix[curr][next_my] == 1 and not visited[next_my]:
+            if hamilton_path_for_single(next_my, adjacency_matrix, n, path):
+                return True
+    visited[curr] = False
+    path.pop()
+    return False
+
+
+def hamilton_path(adjacency_matrix, n, path):
+    for x in range(n):
+        path.clear()
+        if hamilton_path_for_single(x, adjacency_matrix, n, path):
+            return True
+    return False
+
+
 def show_hamilton_path(path):
     for x in path:
         print(x + 1, end="->")
 
 
-# search_euler_loop(create_adjacency_matrix(get_data()))
 myAdjacencyMatrix = create_adjacency_matrix(get_data())
-visited = [False] * len(myAdjacencyMatrix)
+search_euler_loop(myAdjacencyMatrix)
+size = len(myAdjacencyMatrix)
+visited = [False] * size
 Path = []
-if hamilton_cycle(0, myAdjacencyMatrix, len(myAdjacencyMatrix), Path):
+if hamilton_cycle(0, myAdjacencyMatrix, size, Path):
     print("Знайдено гамільтоновий цикл: ")
     show_hamilton_path(Path)
+else:
+    Path = []
+    visited = [False] * size
+    if hamilton_path(myAdjacencyMatrix, size, Path):
+        print("Знайдено гамільтоновий шлях: ")
+        show_hamilton_path(Path)
+    else:
+        print("Гамільтонового шляху чи циклу не знайдено")
