@@ -8,9 +8,7 @@ def get_data():
             line = iFile.readline()
             if not line:
                 break
-            temp = (line[:len(line)] + line[len(line) + 1:]).split()
-            for x in range(len(temp)):
-                temp[x] = int(temp[x])
+            temp = list(map(int, (line[:len(line)] + line[len(line) + 1:]).split()))
             data.append(temp)
     return data
 
